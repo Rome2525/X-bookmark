@@ -2,8 +2,7 @@
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
-<title>イラストアーカイブ v0.6</title>
-
+<title>イラストアーカイブ v1.2</title>
 <meta name="apple-mobile-web-app-capable" content="yes">
 
 <style>
@@ -12,27 +11,80 @@ body {
   margin: 16px;
 }
 
-h1 { font-size: 20px; }
+h1 { font-size: 20px; margin-bottom: 10px; }
 
-/* 入力欄横並び */
-.input-row {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-  margin-bottom: 10px;
+button {
+  cursor: pointer;
 }
-.input-row input,
-.input-row select,
-.input-row button {
-  width: calc(50% - 6px);
+
+/* タブ */
+.tab-bar {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+.tab-btn {
+  padding: 6px 10px;
+  border-radius: 4px;
+  border: 1px solid #ccc;
+  background: #f5f5f5;
+}
+.tab-btn.active {
+  background: #ddd;
+  font-weight: 600;
+}
+
+/* 入力欄縦並び */
+.input-column {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 12px;
+}
+
+.input-column input,
+.input-column select,
+.input-column button {
+  width: 100%;
   box-sizing: border-box;
 }
 
-/* 一覧画面 */
+/* 最近使ったタグ + 全タグ */
+.tag-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin: 8px 0 4px;
+}
+
+.tag-area {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  max-height: 80px;
+  overflow-y: auto;
+}
+
+.tag-area-all {
+  display: none;
+  flex-wrap: wrap;
+  gap: 4px;
+  max-height: 120px;
+  overflow-y: auto;
+  margin-top: 4px;
+}
+
+/* 一覧 */
 #list {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
   gap: 8px;
+}
+
+.card {
+  position: relative;
+  padding-bottom: 4px;
 }
 
 .card img {
@@ -42,212 +94,1119 @@ h1 { font-size: 20px; }
 }
 
 .author {
-  font-weight: bold;
-  font-size: 12px;
+  font-size: 10px;
+  line-height: 1.1;
   opacity: 0.7;
-  margin-top: 2px;
+  margin-top: 1px;
 }
 
-/* モーダル */
-#modal {
-  display: none;
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,0.85);
-  justify-content: center;
-  align-items: center;
-  z-index: 999;
-}
-
-#modalContent {
-  background: #fff;
-  padding: 10px;
-  max-width: 95%;
-  max-height: 95%;
-  overflow: hidden;
-  position: relative;
-}
-
-#modalImage {
-  max-width: 100%;
-  max-height: 80vh;
-  display: block;
-  margin: 0 auto;
-  cursor: grab;
-  user-select: none;
-  touch-action: none;
-}
-
-#modalTags {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 4px;
-  margin: 6px 0;
-}
-
+/* タグの見た目（統一） */
 .tag {
   font-size: 11px;
   padding: 2px 6px;
   border: 1px solid #888;
   border-radius: 6px;
   cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
 }
-.tag.active { background: #ddd; }
+.tag.active { outline: 2px solid #333; }
+
+/* 色つきタグ */
+.tag.colored {
+  color: #000;
+  border-color: transparent;
+}
+
+/* モーダル全画面 */
+#modal {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.9);
+  justify-content: center;
+  align-items: center;
+  z-index: 999;
+}
+
+#modalContent {
+  position: relative;
+  width: 100vw;
+  height: 100vh;
+  color: #fff;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* モーダル上部バー */
+#modalTopBar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 8px;
+  background: rgba(0,0,0,0.8);
+  z-index: 2;
+}
+
+#modalTopBar-left {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+#modalTopBar-right {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+/* 閉じるボタン */
+.modal-close-btn {
+  border: none;
+  background: #333;
+  color: #fff;
+  padding: 4px 8px;
+  border-radius: 4px;
+}
+
+/* 閲覧 / 編集タブ */
+.modal-mode-btn {
+  border-radius: 4px;
+  border: 1px solid #555;
+  background: #222;
+  color: #fff;
+  padding: 2px 8px;
+  font-size: 12px;
+}
+.modal-mode-btn.active {
+  background: #fff;
+  color: #000;
+}
+
+/* モーダルメイン領域 */
+#modalMain {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* 画像エリア */
+#modalImageWrapper {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+}
+
+#modalImage {
+  display: block;
+  max-width: 95vw;
+  max-height: 95vh;
+  cursor: grab;
+  user-select: none;
+  transform-origin: center center;
+}
+
+/* 下部情報エリア（閲覧 / 編集で中身切り替え） */
+#modalInfo {
+  max-height: 40%;
+  overflow-y: auto;
+  padding: 8px;
+  background: rgba(0,0,0,0.8);
+  font-size: 13px;
+}
+
+/* 閲覧モードの中身 */
+.modal-section {
+  margin-bottom: 6px;
+}
+
+/* 入力 */
+#modalInfo input,
+#modalInfo select,
+#modalInfo button,
+#modalInfo textarea {
+  font-size: 13px;
+}
+
+/* タグ一覧（モーダル内） */
+#modalTagsView,
+#modalTagsEdit {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+/* タグ管理セクション */
+#tagManageSection {
+  margin-top: 8px;
+}
+
+.section-block {
+  margin-bottom: 16px;
+  padding: 8px;
+  border-radius: 6px;
+  background: #f9f9f9;
+}
+
+.section-title {
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+
+#categoryList {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.category-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+}
+
+.category-row input[type="text"] {
+  flex: 1;
+}
+
+#tagManageList {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  max-height: 50vh;
+  overflow-y: auto;
+}
+
+.tag-manage-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+}
+.tag-color-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  border: 1px solid #555;
+}
+
+/* 小さめボタン */
+.btn-sm {
+  font-size: 11px;
+  padding: 2px 6px;
+}
 </style>
 </head>
 
 <body>
 
-<h1>イラストアーカイブ</h1>
+<h1>イラストアーカイブ v1.2</h1>
 
-<div class="input-row">
-  <input type="file" id="imageInput" accept="image/*">
-  <input type="text" id="urlInput" placeholder="元ツイートURL">
-  <input type="text" id="authorInput" placeholder="作者名">
-  <input type="text" id="tagInput" placeholder="タグ（カンマ区切り）">
-  <select id="genreSelect">
-    <option value="">ジャンル</option>
-    <option value="ファンタジー">ファンタジー</option>
-    <option value="日常">日常</option>
-  </select>
-  <select id="styleSelect">
-    <option value="">作風</option>
-    <option value="アニメ風">アニメ風</option>
-    <option value="リアル">リアル</option>
-  </select>
-  <select id="partSelect">
-    <option value="">パーツ</option>
-    <option value="キャラクター">キャラクター</option>
-    <option value="背景">背景</option>
-  </select>
-  <button onclick="addItem()">追加</button>
+<div class="tab-bar">
+  <button id="tabMain" class="tab-btn active">画像一覧</button>
+  <button id="tabTags" class="tab-btn">タグ管理</button>
 </div>
 
-<select id="sortSelect" onchange="render()">
-  <option value="new">新しい順</option>
-  <option value="old">古い順</option>
-  <option value="fav">お気に入り優先</option>
-</select>
+<!-- 画像一覧タブ -->
+<div id="mainSection">
 
-<h3>タグ</h3>
-<div id="tags"></div>
+  <div class="input-column">
+    <input type="file" id="imageInput" accept="image/*">
+    <input type="text" id="urlInput" placeholder="元ツイートURL">
+    <input type="text" id="authorInput" placeholder="作者名">
+    <input type="text" id="tagInput" placeholder="タグ（カンマ区切り）">
 
-<h3>一覧</h3>
-<div id="list"></div>
+    <button onclick="addItem()">追加</button>
+  </div>
+
+  <select id="sortSelect" onchange="render()">
+    <option value="new">新しい順</option>
+    <option value="old">古い順</option>
+    <option value="fav">お気に入り優先</option>
+  </select>
+
+  <div class="tag-header">
+    <span>最近使ったタグ</span>
+    <button id="toggleAllTagsBtn" class="btn-sm">タグ一覧 ▼</button>
+  </div>
+  <div id="recentTags" class="tag-area"></div>
+  <div id="allTags" class="tag-area-all"></div>
+
+  <h3>一覧</h3>
+  <div id="list"></div>
+</div>
+
+<!-- タグ管理タブ -->
+<div id="tagManageSection" style="display:none;">
+
+  <div class="section-block">
+    <div class="section-title">分類一覧</div>
+    <div style="display:flex; gap:6px; margin-bottom:6px;">
+      <input type="text" id="newCategoryName" placeholder="分類名（例：作品）" style="flex:1;">
+      <input type="color" id="newCategoryColor" value="#4da3ff">
+      <button class="btn-sm" onclick="addCategory()">追加</button>
+    </div>
+    <div id="categoryList"></div>
+  </div>
+
+  <div class="section-block">
+    <div class="section-title">タグと分類の対応</div>
+    <div id="tagManageList"></div>
+  </div>
+
+</div>
 
 <!-- モーダル -->
 <div id="modal">
   <div id="modalContent">
-    <button onclick="closeModal()">×</button>
-    <img id="modalImage">
-    ⭐ <button id="favBtn"></button>
-    <div>
-      <label>作者</label>
+
+    <!-- 上部バー -->
+    <div id="modalTopBar">
+      <div id="modalTopBar-left">
+        <button class="modal-close-btn" onclick="closeModal()">×</button>
+        <button id="modeViewBtn" class="modal-mode-btn active">閲覧</button>
+        <button id="modeEditBtn" class="modal-mode-btn">編集</button>
+      </div>
+      <div id="modalTopBar-right">
+        <span>⭐</span>
+        <button id="favBtn" class="btn-sm"></button>
+        <button id="openUrlBtn" class="btn-sm">元ツイート</button>
+        <button id="deleteBtn" class="btn-sm">削除</button>
+      </div>
     </div>
-    <input type="text" id="editAuthor" placeholder="作者名を編集">
-    <h4>タグ</h4>
-    <div id="modalTags"></div>
-    <input type="text" id="modalTagInput" placeholder="Enterでタグ追加">
-    <button id="openUrlBtn">元ツイートを見る</button>
-    <button id="deleteBtn">削除</button>
+
+    <!-- メイン -->
+    <div id="modalMain">
+      <div id="modalImageWrapper">
+        <img id="modalImage">
+      </div>
+
+      <div id="modalInfo">
+        <!-- 閲覧モード -->
+        <div id="viewMode">
+          <div class="modal-section">
+            <div>作者: <span id="viewAuthor"></span></div>
+            <div>URL: <a id="viewUrl" href="#" target="_blank" style="color:#8cf;"></a></div>
+          </div>
+
+          <div class="modal-section">
+            <label>状態タグ</label>
+            <select id="stateSelect">
+              <option value="">状態なし</option>
+              <option value="完成">完成</option>
+              <option value="塗り">塗り</option>
+              <option value="線画">線画</option>
+              <option value="ラフ">ラフ</option>
+              <option value="構想">構想</option>
+            </select>
+          </div>
+
+          <div class="modal-section">
+            <div>タグ</div>
+            <div id="modalTagsView"></div>
+          </div>
+        </div>
+
+        <!-- 編集モード -->
+        <div id="editMode" style="display:none;">
+          <div class="modal-section">
+            <label>元ツイートURL</label><br>
+            <input type="text" id="editUrl" style="width:100%;">
+          </div>
+          <div class="modal-section">
+            <label>作者名</label><br>
+            <input type="text" id="editAuthor" style="width:100%;">
+          </div>
+          <div class="modal-section">
+            <label>状態タグ</label><br>
+            <select id="editStateSelect">
+              <option value="">状態なし</option>
+              <option value="完成">完成</option>
+              <option value="塗り">塗り</option>
+              <option value="線画">線画</option>
+              <option value="ラフ">ラフ</option>
+              <option value="構想">構想</option>
+            </select>
+          </div>
+          <div class="modal-section">
+            <label>タグ</label>
+            <div id="modalTagsEdit"></div>
+            <input type="text" id="modalTagInput" placeholder="Enterでタグ追加" style="width:100%; margin-top:4px;">
+          </div>
+          <div class="modal-section" style="text-align:right;">
+            <button class="btn-sm" onclick="cancelEdit()">キャンセル</button>
+            <button class="btn-sm" onclick="saveEdit()">保存</button>
+          </div>
+          <div class="modal-section">
+            <label>画像差し替え</label><br>
+            <input type="file" id="replaceImageInput" accept="image/*">
+          </div>
+        </div>
+      </div>
+    </div>
+
   </div>
 </div>
 
 <script>
-/* IndexedDB */
+/* ===== IndexedDB ===== */
 let db;
-const req = indexedDB.open("artDB",1);
-req.onupgradeneeded = e => db = e.target.result, db.createObjectStore("arts",{keyPath:"id"});
-req.onsuccess = e => (db=e.target.result, loadAll());
+let items = [];
+let activeTag = null;
+let activeAuthor = null;
+let currentItem = null;
+let modalMode = "view"; // "view" or "edit"
 
-let items=[], activeTag=null, activeAuthor=null, currentItem=null;
+// 分類・タグ分類
+let categories = [];          // {id, name, color}
+let tagCategoryList = [];     // {tag, categoryId}
+let tagCategoryMap = {};      // tag -> categoryId（高速参照用）
 
-function saveItem(item){ db.transaction("arts","readwrite").objectStore("arts").put(item); }
-function deleteItem(id){ db.transaction("arts","readwrite").objectStore("arts").delete(id); }
-function loadAll(){ db.transaction("arts","readonly").objectStore("arts").getAll().onsuccess = e => (items=e.target.result, render()); }
+const req = indexedDB.open("artDB", 2);
 
-function addItem(){
-  const file=imageInput.files[0];
-  if(!file) return alert("画像を選択してください");
-  const reader=new FileReader();
-  reader.onload=()=>{
-    const item={id:Date.now(), image:reader.result, url:urlInput.value, author:authorInput.value, tags:tagInput.value.split(",").map(t=>t.trim()).filter(Boolean), favorite:false};
+req.onupgradeneeded = e => {
+  db = e.target.result;
+
+  if (!db.objectStoreNames.contains("arts")) {
+    db.createObjectStore("arts", { keyPath: "id" });
+  }
+  if (!db.objectStoreNames.contains("categories")) {
+    db.createObjectStore("categories", { keyPath: "id" });
+  }
+  if (!db.objectStoreNames.contains("tagCategories")) {
+    db.createObjectStore("tagCategories", { keyPath: "tag" });
+  }
+};
+
+req.onsuccess = e => {
+  db = e.target.result;
+  loadAll();
+  loadCategories();
+  loadTagCategories();
+};
+
+req.onerror = e => {
+  console.error("IndexedDB error", e.target.error);
+};
+
+/* ===== タブ切り替え ===== */
+const tabMain = document.getElementById("tabMain");
+const tabTags = document.getElementById("tabTags");
+const mainSection = document.getElementById("mainSection");
+const tagManageSection = document.getElementById("tagManageSection");
+
+tabMain.onclick = () => {
+  tabMain.classList.add("active");
+  tabTags.classList.remove("active");
+  mainSection.style.display = "";
+  tagManageSection.style.display = "none";
+};
+
+tabTags.onclick = () => {
+  tabTags.classList.add("active");
+  tabMain.classList.remove("active");
+  mainSection.style.display = "none";
+  tagManageSection.style.display = "";
+  renderTagManager();
+};
+
+/* ===== 保存/削除 ===== */
+function saveItem(item) {
+  const tx = db.transaction("arts", "readwrite");
+  tx.objectStore("arts").put(item);
+}
+
+function deleteItem(id) {
+  const tx = db.transaction("arts", "readwrite");
+  tx.objectStore("arts").delete(id);
+}
+
+function loadAll() {
+  const tx = db.transaction("arts", "readonly");
+  tx.objectStore("arts").getAll().onsuccess = e => {
+    items = e.target.result || [];
+    render();
+  };
+}
+
+/* ===== 分類関連 ===== */
+function loadCategories() {
+  const tx = db.transaction("categories", "readonly");
+  tx.objectStore("categories").getAll().onsuccess = e => {
+    categories = e.target.result || [];
+    renderTags();
+    renderModalTagsView();
+    renderModalTagsEdit();
+    renderTagManager();
+  };
+}
+
+function loadTagCategories() {
+  const tx = db.transaction("tagCategories", "readonly");
+  tx.objectStore("tagCategories").getAll().onsuccess = e => {
+    tagCategoryList = e.target.result || [];
+    rebuildTagCategoryMap();
+    renderTags();
+    renderModalTagsView();
+    renderModalTagsEdit();
+    renderTagManager();
+  };
+}
+
+function rebuildTagCategoryMap() {
+  tagCategoryMap = {};
+  tagCategoryList.forEach(tc => {
+    tagCategoryMap[tc.tag] = tc.categoryId;
+  });
+}
+
+function addCategory() {
+  const nameInput = document.getElementById("newCategoryName");
+  const colorInput = document.getElementById("newCategoryColor");
+  const name = nameInput.value.trim();
+  const color = colorInput.value;
+
+  if (!name) {
+    alert("分類名を入力してください");
+    return;
+  }
+
+  const id = Date.now();
+  const cat = { id, name, color };
+  const tx = db.transaction("categories", "readwrite");
+  tx.objectStore("categories").put(cat).onsuccess = () => {
+    categories.push(cat);
+    nameInput.value = "";
+    renderTagManager();
+    renderTags();
+    renderModalTagsView();
+    renderModalTagsEdit();
+  };
+}
+
+function updateCategory(cat) {
+  const tx = db.transaction("categories", "readwrite");
+  tx.objectStore("categories").put(cat).onsuccess = () => {
+    renderTagManager();
+    renderTags();
+    renderModalTagsView();
+    renderModalTagsEdit();
+  };
+}
+
+function deleteCategory(id) {
+  if (!confirm("この分類を削除しますか？\n（紐づくタグは分類なしになります）")) return;
+
+  const tx = db.transaction("categories", "readwrite");
+  tx.objectStore("categories").delete(id).onsuccess = () => {
+    categories = categories.filter(c => c.id !== id);
+
+    const tx2 = db.transaction("tagCategories", "readwrite");
+    const store = tx2.objectStore("tagCategories");
+    tagCategoryList.forEach(tc => {
+      if (tc.categoryId === id) {
+        store.delete(tc.tag);
+      }
+    });
+    tx2.oncomplete = () => {
+      tagCategoryList = tagCategoryList.filter(tc => tc.categoryId !== id);
+      rebuildTagCategoryMap();
+      renderTagManager();
+      renderTags();
+      renderModalTagsView();
+      renderModalTagsEdit();
+    };
+  };
+}
+
+function setTagCategory(tag, categoryId) {
+  const tx = db.transaction("tagCategories", "readwrite");
+  const store = tx.objectStore("tagCategories");
+
+  if (!categoryId) {
+    store.delete(tag).onsuccess = () => {
+      tagCategoryList = tagCategoryList.filter(tc => tc.tag !== tag);
+      rebuildTagCategoryMap();
+      renderTagManager();
+      renderTags();
+      renderModalTagsView();
+      renderModalTagsEdit();
+    };
+    return;
+  }
+
+  const obj = { tag, categoryId };
+  store.put(obj).onsuccess = () => {
+    const idx = tagCategoryList.findIndex(tc => tc.tag === tag);
+    if (idx >= 0) tagCategoryList[idx] = obj; else tagCategoryList.push(obj);
+    rebuildTagCategoryMap();
+    renderTagManager();
+    renderTags();
+    renderModalTagsView();
+    renderModalTagsEdit();
+  };
+}
+
+function getCategoryById(id) {
+  return categories.find(c => c.id === id);
+}
+
+function getCategoryForTag(tag) {
+  const cid = tagCategoryMap[tag];
+  if (!cid) return null;
+  return getCategoryById(cid) || null;
+}
+
+/* ===== 追加 ===== */
+function addItem() {
+  const file = imageInput.files[0];
+  if (!file) return alert("画像を選択してください");
+
+  const reader = new FileReader();
+  reader.onload = () => {
+    const now = new Date().toISOString();
+    const tags = tagInput.value.split(",").map(t=>t.trim()).filter(Boolean);
+
+    const item = {
+      id: Date.now(),
+      image: reader.result,
+      url: urlInput.value,
+      author: authorInput.value,
+      state: "",
+      tags,
+      favorite: false,
+      createdAt: now
+    };
+
     items.unshift(item);
     saveItem(item);
-    imageInput.value=urlInput.value=authorInput.value=tagInput.value="";
+
+    imageInput.value = urlInput.value = authorInput.value = tagInput.value = "";
     render();
   };
   reader.readAsDataURL(file);
 }
 
-function render(){
+/* ===== 表示 ===== */
+function render() {
   renderTags();
   renderList();
 }
 
-function renderTags(){
-  tags.innerHTML="";
-  [...new Set(items.flatMap(i=>i.tags))].forEach(t=>{
-    const s=document.createElement("span");
-    s.className="tag"+(t===activeTag?" active":"");
-    s.textContent=t;
-    s.onclick=()=>{activeTag=activeTag===t?null:t;activeAuthor=null;render();}
-    tags.appendChild(s);
+/* タグ一覧（最近使った＋全タグ） */
+function renderTags() {
+  const recentContainer = document.getElementById("recentTags");
+  const allContainer = document.getElementById("allTags");
+  if (!recentContainer || !allContainer) return;
+  recentContainer.innerHTML = "";
+  allContainer.innerHTML = "";
+
+  const tagLastUsed = {};
+  items.forEach(item => {
+    const when = item.createdAt || new Date(item.id).toISOString();
+    (item.tags || []).forEach(t => {
+      if (!tagLastUsed[t] || tagLastUsed[t] < when) {
+        tagLastUsed[t] = when;
+      }
+    });
+  });
+
+  const allTagsArr = Object.keys(tagLastUsed);
+  allTagsArr.sort((a,b) => tagLastUsed[b].localeCompare(tagLastUsed[a])); // 新しい順
+
+  allTagsArr.forEach(t => {
+    const span = document.createElement("span");
+    span.className = "tag" + (t === activeTag ? " active" : "");
+    const cat = getCategoryForTag(t);
+    if (cat) {
+      span.classList.add("colored");
+      span.style.backgroundColor = cat.color;
+    }
+    span.textContent = t;
+    span.onclick = () => {
+      activeTag = (activeTag === t) ? null : t;
+      activeAuthor = null;
+      render();
+    };
+    recentContainer.appendChild(span);
+  });
+
+  // 全タグ（名前順）
+  const allTagsSorted = [...allTagsArr].sort((a,b)=>a.localeCompare(b));
+  allTagsSorted.forEach(t => {
+    const span = document.createElement("span");
+    span.className = "tag" + (t === activeTag ? " active" : "");
+    const cat = getCategoryForTag(t);
+    if (cat) {
+      span.classList.add("colored");
+      span.style.backgroundColor = cat.color;
+    }
+    span.textContent = t;
+    span.onclick = () => {
+      activeTag = (activeTag === t) ? null : t;
+      activeAuthor = null;
+      render();
+    };
+    allContainer.appendChild(span);
   });
 }
 
-function renderList(){
-  list.innerHTML="";
-  let filtered = items.filter(i=>(!activeTag||i.tags.includes(activeTag))&&(!activeAuthor||i.author===activeAuthor));
-  if(sortSelect.value==="old") filtered=[...filtered].reverse();
-  if(sortSelect.value==="fav") filtered=[...filtered].sort((a,b)=>b.favorite-a.favorite);
-  filtered.forEach(i=>{
-    const img=document.createElement("img");
-    img.src=i.image;
-    img.onclick=()=>openModal(i);
-    const author=document.createElement("div");
-    author.className="author"; author.textContent=i.author||"";
-    const div=document.createElement("div"); div.className="card"; div.append(img,author);
-    list.appendChild(div);
+/* 全タグ展開ボタン */
+const toggleAllTagsBtn = document.getElementById("toggleAllTagsBtn");
+const allTagsDiv = document.getElementById("allTags");
+let allTagsVisible = false;
+toggleAllTagsBtn.onclick = () => {
+  allTagsVisible = !allTagsVisible;
+  allTagsDiv.style.display = allTagsVisible ? "flex" : "none";
+  toggleAllTagsBtn.textContent = allTagsVisible ? "タグ一覧 ▲" : "タグ一覧 ▼";
+};
+
+/* 一覧（カード） */
+function renderList() {
+  const container = document.getElementById("list");
+  container.innerHTML = "";
+
+  let filtered = items.filter(i =>
+    (!activeTag || (i.tags || []).includes(activeTag)) &&
+    (!activeAuthor || i.author === activeAuthor)
+  );
+
+  if (sortSelect.value === "old") filtered = [...filtered].reverse();
+  if (sortSelect.value === "fav") filtered = [...filtered].sort((a,b)=>b.favorite - a.favorite);
+
+  filtered.forEach(i => {
+    const div = document.createElement("div");
+    div.className = "card";
+
+    const img = document.createElement("img");
+    img.src = i.image;
+    img.onclick = () => openModal(i);
+
+    const author = document.createElement("div");
+    author.className = "author";
+    author.textContent = i.author || "";
+
+    div.append(img, author);
+    container.appendChild(div);
   });
 }
 
-/* モーダル */
-function openModal(item){
-  currentItem=item;
-  modal.style.display="flex";
-  modalImage.src=item.image;
-  favBtn.textContent=item.favorite?"解除":"お気に入り";
-  favBtn.onclick=()=>{item.favorite=!item.favorite;saveItem(item);openModal(item);render();}
-  editAuthor.value=item.author;
-  editAuthor.onchange=()=>{item.author=editAuthor.value;saveItem(item);render();}
-  renderModalTags();
-  openUrlBtn.onclick=()=>{if(item.url) window.open(item.url);}
-  deleteBtn.onclick=()=>{if(confirm("削除する？")){deleteItem(item.id);items=items.filter(x=>x.id!==item.id);closeModal();render();}}
-  /* モーダルズーム＋ドラッグ */
-  let scale=1, posX=0, posY=0, startX=0, startY=0, dragging=false;
-  modalImage.style.transform=`translate(0px,0px) scale(1)`;
-  modalImage.onpointerdown=e=>{dragging=true;startX=e.clientX-posX;startY=e.clientY-posY;modalImage.setPointerCapture(e.pointerId);}
-  modalImage.onpointermove=e=>{if(dragging){posX=e.clientX-startX;posY=e.clientY-startY;modalImage.style.transform=`translate(${posX}px,${posY}px) scale(${scale})`;}}
-  modalImage.onpointerup=modalImage.onpointercancel=e=>{dragging=false;}
-  modalImage.ondblclick=()=>{scale=scale===1?2:1; modalImage.style.transform=`translate(${posX}px,${posY}px) scale(${scale})`;}
-}
+/* ===== タグ管理画面 ===== */
+function renderTagManager() {
+  const catList = document.getElementById("categoryList");
+  const tagList = document.getElementById("tagManageList");
+  if (!catList || !tagList) return;
 
-function renderModalTags(){
-  modalTags.innerHTML="";
-  if(!currentItem||!currentItem.tags) return;
-  currentItem.tags.forEach(t=>{
-    const s=document.createElement("span"); s.className="tag"; s.textContent=t;
-    s.onclick=()=>{if(confirm(`タグ「${t}」を削除しますか？`)){currentItem.tags=currentItem.tags.filter(x=>x!==t);saveItem(currentItem);renderModalTags();render();}}
-    modalTags.appendChild(s);
+  catList.innerHTML = "";
+  categories.forEach(cat => {
+    const row = document.createElement("div");
+    row.className = "category-row";
+
+    const color = document.createElement("input");
+    color.type = "color";
+    color.value = cat.color;
+    color.onchange = () => {
+      cat.color = color.value;
+      updateCategory(cat);
+    };
+
+    const name = document.createElement("input");
+    name.type = "text";
+    name.value = cat.name;
+    name.onchange = () => {
+      cat.name = name.value.trim();
+      updateCategory(cat);
+    };
+
+    const del = document.createElement("button");
+    del.textContent = "削除";
+    del.className = "btn-sm";
+    del.onclick = () => deleteCategory(cat.id);
+
+    row.append(color, name, del);
+    catList.appendChild(row);
+  });
+
+  tagList.innerHTML = "";
+  const allTags = [...new Set(items.flatMap(i => i.tags || []))].sort();
+
+  allTags.forEach(tag => {
+    const row = document.createElement("div");
+    row.className = "tag-manage-row";
+
+    const dot = document.createElement("div");
+    dot.className = "tag-color-dot";
+
+    const cat = getCategoryForTag(tag);
+    if (cat) {
+      dot.style.backgroundColor = cat.color;
+    } else {
+      dot.style.backgroundColor = "#fff";
+    }
+
+    const label = document.createElement("span");
+    label.textContent = tag;
+
+    const select = document.createElement("select");
+    const optNone = document.createElement("option");
+    optNone.value = "";
+    optNone.textContent = "分類なし";
+    select.appendChild(optNone);
+
+    categories.forEach(c => {
+      const op = document.createElement("option");
+      op.value = String(c.id);
+      op.textContent = c.name;
+      select.appendChild(op);
+    });
+
+    if (cat) select.value = String(cat.id);
+    else select.value = "";
+
+    select.onchange = () => {
+      const val = select.value;
+      const cid = val ? Number(val) : null;
+      setTagCategory(tag, cid);
+    };
+
+    row.append(dot, label, select);
+    tagList.appendChild(row);
   });
 }
 
-modalTagInput.onkeydown=e=>{if(e.key==="Enter"){const t=modalTagInput.value.trim();if(t&&!currentItem.tags.includes(t)){currentItem.tags.push(t);saveItem(currentItem);renderModalTags();render();}modalTagInput.value="";}}
-function closeModal(){modal.style.display="none";currentItem=null;}
-modal.addEventListener("click",e=>{if(e.target===modal) closeModal();});
-document.addEventListener("keydown",e=>{if(e.key==="Escape"&&modal.style.display==="flex") closeModal();});
-render();
+/* ===== モーダル ===== */
+const modal = document.getElementById("modal");
+const modalImage = document.getElementById("modalImage");
+const favBtn = document.getElementById("favBtn");
+const stateSelect = document.getElementById("stateSelect");
+const editStateSelect = document.getElementById("editStateSelect");
+const openUrlBtn = document.getElementById("openUrlBtn");
+const deleteBtn = document.getElementById("deleteBtn");
+const viewAuthorSpan = document.getElementById("viewAuthor");
+const viewUrlLink = document.getElementById("viewUrl");
+const editUrlInput = document.getElementById("editUrl");
+const editAuthorInput = document.getElementById("editAuthor");
+const modalTagsViewDiv = document.getElementById("modalTagsView");
+const modalTagsEditDiv = document.getElementById("modalTagsEdit");
+const modalTagInput = document.getElementById("modalTagInput");
+const replaceImageInput = document.getElementById("replaceImageInput");
+const modeViewBtn = document.getElementById("modeViewBtn");
+const modeEditBtn = document.getElementById("modeEditBtn");
+const viewModeDiv = document.getElementById("viewMode");
+const editModeDiv = document.getElementById("editMode");
+
+function setModalMode(mode) {
+  modalMode = mode;
+  if (mode === "view") {
+    modeViewBtn.classList.add("active");
+    modeEditBtn.classList.remove("active");
+    viewModeDiv.style.display = "";
+    editModeDiv.style.display = "none";
+  } else {
+    modeEditBtn.classList.add("active");
+    modeViewBtn.classList.remove("active");
+    viewModeDiv.style.display = "none";
+    editModeDiv.style.display = "";
+  }
+}
+
+modeViewBtn.onclick = () => {
+  setModalMode("view");
+};
+modeEditBtn.onclick = () => {
+  setModalMode("edit");
+};
+
+function openModal(item) {
+  currentItem = JSON.parse(JSON.stringify(item)); // 編集キャンセルのためにコピー
+  modal.style.display = "flex";
+  setupModalImage(item.image);
+
+  favBtn.textContent = item.favorite ? "解除" : "お気に入り";
+
+  viewAuthorSpan.textContent = item.author || "";
+  if (item.url) {
+    viewUrlLink.textContent = item.url;
+    viewUrlLink.href = item.url;
+  } else {
+    viewUrlLink.textContent = "";
+    viewUrlLink.href = "#";
+  }
+
+  editUrlInput.value = item.url || "";
+  editAuthorInput.value = item.author || "";
+
+  stateSelect.value = item.state || "";
+  editStateSelect.value = item.state || "";
+
+  renderModalTagsView();
+  renderModalTagsEdit();
+
+  replaceImageInput.value = "";
+
+  setModalMode("view");
+}
+
+/* 画像ズーム・ドラッグ・ホイール */
+let scale = 1, posX = 0, posY = 0;
+let startX = 0, startY = 0;
+let isDragging = false;
+
+function setupModalImage(src) {
+  modalImage.src = src;
+  scale = 1;
+  posX = 0;
+  posY = 0;
+  modalImage.style.transform = "translate(0px,0px) scale(1)";
+}
+
+/* ドラッグ */
+modalImage.onmousedown = e => {
+  e.preventDefault();
+  isDragging = true;
+  startX = e.clientX - posX;
+  startY = e.clientY - posY;
+  modalImage.style.cursor = "grabbing";
+};
+
+document.onmousemove = e => {
+  if (!isDragging) return;
+  posX = e.clientX - startX;
+  posY = e.clientY - startY;
+  modalImage.style.transform = `translate(${posX}px,${posY}px) scale(${scale})`;
+};
+
+document.onmouseup = e => {
+  isDragging = false;
+  modalImage.style.cursor = "grab";
+};
+
+/* ダブルクリックで 1x / 2x */
+modalImage.ondblclick = e => {
+  scale = (scale === 1 ? 2 : 1);
+  modalImage.style.transform = `translate(${posX}px,${posY}px) scale(${scale})`;
+};
+
+/* ホイールズーム（Ctrl+ホイールでブラウザズーム防止 & 画像ズーム） */
+window.addEventListener("wheel", e => {
+  if (modal.style.display !== "flex") return;
+
+  if (e.ctrlKey) {
+    e.preventDefault();
+  }
+
+  const delta = e.deltaY;
+  const zoomFactor = 1.05;
+  if (delta < 0) {
+    scale *= zoomFactor;
+  } else {
+    scale /= zoomFactor;
+  }
+  scale = Math.max(0.2, Math.min(scale, 8));
+  modalImage.style.transform = `translate(${posX}px,${posY}px) scale(${scale})`;
+}, { passive: false });
+
+/* お気に入り */
+favBtn.onclick = () => {
+  if (!currentItem) return;
+  const original = items.find(i => i.id === currentItem.id);
+  if (!original) return;
+  original.favorite = !original.favorite;
+  saveItem(original);
+  favBtn.textContent = original.favorite ? "解除" : "お気に入り";
+  render();
+};
+
+/* 状態タグ（閲覧モード側） */
+stateSelect.onchange = () => {
+  if (!currentItem) return;
+  const original = items.find(i => i.id === currentItem.id);
+  if (!original) return;
+  original.state = stateSelect.value;
+  editStateSelect.value = original.state;
+  saveItem(original);
+  render();
+  showStateNotification(`状態: ${original.state || "なし"}`);
+};
+
+/* 状態タグ（編集モード側） */
+editStateSelect.onchange = () => {
+  if (!currentItem) return;
+  currentItem.state = editStateSelect.value;
+};
+
+/* URLボタン（閲覧用リンクはaタグなのでここは使わないが、保険で残す） */
+openUrlBtn.onclick = () => {
+  if (currentItem && currentItem.url) {
+    window.open(currentItem.url, "_blank");
+  }
+};
+
+/* 削除 */
+deleteBtn.onclick = () => {
+  if (!currentItem) return;
+  if (confirm("削除する？")) {
+    deleteItem(currentItem.id);
+    items = items.filter(x => x.id !== currentItem.id);
+    closeModal();
+    render();
+  }
+};
+
+/* 閲覧モード用タグ表示（削除不可） */
+function renderModalTagsView() {
+  if (!modalTagsViewDiv) return;
+  modalTagsViewDiv.innerHTML = "";
+  if (!currentItem || !currentItem.tags) return;
+
+  currentItem.tags.forEach(t => {
+    const span = document.createElement("span");
+    span.className = "tag";
+    const cat = getCategoryForTag(t);
+    if (cat) {
+      span.classList.add("colored");
+      span.style.backgroundColor = cat.color;
+    }
+    span.textContent = t;
+    modalTagsViewDiv.appendChild(span);
+  });
+}
+
+/* 編集モード用タグ表示（削除可） */
+function renderModalTagsEdit() {
+  if (!modalTagsEditDiv) return;
+  modalTagsEditDiv.innerHTML = "";
+  if (!currentItem || !currentItem.tags) return;
+
+  currentItem.tags.forEach(t => {
+    const span = document.createElement("span");
+    span.className = "tag";
+    const cat = getCategoryForTag(t);
+    if (cat) {
+      span.classList.add("colored");
+      span.style.backgroundColor = cat.color;
+    }
+    span.textContent = t + " ×";
+    span.onclick = () => {
+      if (!currentItem) return;
+      currentItem.tags = currentItem.tags.filter(x => x !== t);
+      renderModalTagsEdit();
+    };
+    modalTagsEditDiv.appendChild(span);
+  });
+}
+
+/* 編集モード：タグ追加 */
+modalTagInput.onkeydown = e => {
+  if (e.key === "Enter") {
+    if (!currentItem) return;
+    const t = modalTagInput.value.trim();
+    if (t && !currentItem.tags.includes(t)) {
+      currentItem.tags.push(t);
+      renderModalTagsEdit();
+    }
+    modalTagInput.value = "";
+  }
+};
+
+/* 編集モード：キャンセル */
+function cancelEdit() {
+  if (!currentItem) return;
+  const original = items.find(i => i.id === currentItem.id);
+  if (!original) return;
+  currentItem = JSON.parse(JSON.stringify(original));
+  editUrlInput.value = currentItem.url || "";
+  editAuthorInput.value = currentItem.author || "";
+  editStateSelect.value = currentItem.state || "";
+  renderModalTagsEdit();
+  setModalMode("view");
+  renderModalTagsView();
+}
+
+/* 編集モード：保存 */
+function saveEdit() {
+  if (!currentItem) return;
+  const original = items.find(i => i.id === currentItem.id);
+  if (!original) return;
+
+  original.url = editUrlInput.value.trim();
+  original.author = editAuthorInput.value.trim();
+  original.state = editStateSelect.value;
+  original.tags = [...currentItem.tags];
+
+  // 画像差し替え
+  if (replaceImageInput.files && replaceImageInput.files[0]) {
+    const file = replaceImageInput.files[0];
+    const reader = new FileReader();
+    reader.onload = () => {
+      original.image = reader.result;
+      finalizeSave(original);
+    };
+    reader.readAsDataURL(file);
+  } else {
+    finalizeSave(original);
+  }
+}
+
+function finalizeSave(original) {
+  saveItem(original);
+  items = items.map(i => i.id === original.id ? original : i);
+  currentItem = JSON.parse(JSON.stringify(original));
+  viewAuthorSpan.textContent = original.author || "";
+  if (original.url) {
+    viewUrlLink.textContent = original.url;
+    viewUrlLink.href = original.url;
+  } else {
+    viewUrlLink.textContent = "";
+    viewUrlLink.href = "#";
+  }
+  stateSelect.value = original.state || "";
+  editStateSelect.value = original.state || "";
+  setupModalImage(original.image);
+  renderModalTagsView();
+  renderModalTagsEdit();
+  replaceImageInput.value = "";
+  setModalMode("view");
+  render();
+}
+
+/* モーダル閉じる */
+function closeModal() {
+  modal.style.display = "none";
+  currentItem = null;
+}
+modal.addEventListener("click", e => {
+  if (e.target === modal) closeModal();
+});
+document.addEventListener("keydown", e => {
+  if (e.key === "Escape" && modal.style.display === "flex") closeModal();
+});
+
+/* ===== 状態通知 ===== */
+function showStateNotification(msg) {
+  let n = document.createElement("div");
+  n.textContent = msg;
+  n.style.position = "fixed";
+  n.style.bottom = "20%";
+  n.style.left = "50%";
+  n.style.transform = "translateX(-50%)";
+  n.style.background = "rgba(0,0,0,0.7)";
+  n.style.color = "white";
+  n.style.padding = "6px 12px";
+  n.style.borderRadius = "4px";
+  n.style.zIndex = 2000;
+  document.body.appendChild(n);
+  setTimeout(() => n.remove(), 1000);
+}
 </script>
 </body>
 </html>
+
+
